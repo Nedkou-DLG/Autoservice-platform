@@ -18,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "car_services")
-@RequiredArgsConstructor
 public class CarService extends BaseEntity {
     private String name;
 

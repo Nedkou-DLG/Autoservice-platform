@@ -13,6 +13,7 @@ import com.nedyalkoboydev.autoserviceplatform.persistence.repositories.IUserRepo
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +62,7 @@ public class AuthenticationService implements IAuthenticationService {
     @Override
     public AuthenticationResponse login(LoginViewModel request) {
         authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = repository.findByEmail(request.getEmail()).orElseThrow();
+        var user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("The user was not found!"));
         var jwtToken = jwtService.generateToken(Map.of("id", user.getId()), user);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
