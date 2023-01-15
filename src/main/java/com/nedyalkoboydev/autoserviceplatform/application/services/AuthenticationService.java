@@ -54,7 +54,11 @@ public class AuthenticationService implements IAuthenticationService {
         }
 
         repository.save(user);
-        String jwtToken = jwtService.generateToken(Map.of("id", user.getId()), user);
+        String jwtToken = jwtService.generateToken(Map.of("firstname", user.getFirstName(),
+                "id", user.getId(),
+
+                                                        "lastname", user.getLastName(),
+                                                        "role", user.getRole()), user);
 
         return AuthenticationResponse.builder().token(jwtToken).build();
     }

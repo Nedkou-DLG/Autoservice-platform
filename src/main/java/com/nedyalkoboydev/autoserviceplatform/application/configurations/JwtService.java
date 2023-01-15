@@ -1,5 +1,9 @@
 package com.nedyalkoboydev.autoserviceplatform.application.configurations;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nedyalkoboydev.autoserviceplatform.domain.dtos.UserDTO;
+import com.nedyalkoboydev.autoserviceplatform.domain.entities.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -20,8 +24,10 @@ public class JwtService {
     @Value("${secret.key}")
     private String SECRET_KEY;
 
-    public String extractUsername(String token){
-        return extractClaim(token, Claims::getSubject);
+    public String extractUsername(String token) throws JsonProcessingException {
+        String sub = extractClaim(token, Claims::getSubject);
+        UserDTO userDto = new ObjectMapper().readValue(sub, UserDTO.class);
+        return userDto.getEmail();
     }
 
     private <T> T extractClaim(java.lang.String token, Function<Claims, T> claimsResolver) {
@@ -38,25 +44,31 @@ public class JwtService {
                 .getBody();
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            User userDetails
     ) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(UserDTO.builder()
+                        .id(userDetails.getId())
+                        .firstname(userDetails.getFirstName())
+                        .lastname(userDetails.getLastName())
+                        .email(userDetails.getEmail())
+                        .role(userDetails.getRole().name())
+                        .build().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // One day
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails) throws JsonProcessingException {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }

@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### UI Project ###
+/ui/node_modules/
