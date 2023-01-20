@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -28,7 +29,7 @@ public class Employee extends User {
     @JoinColumn(name = "car_service_id")
     private CarService carService;
 
-    @OneToOne(mappedBy = "employee")
-    private AppointmentCalendar schedule;
+    @OneToMany(mappedBy = "employee")
+    private List<AppointmentCalendar> schedule;
 
 }

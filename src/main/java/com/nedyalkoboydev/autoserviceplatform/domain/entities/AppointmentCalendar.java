@@ -1,8 +1,10 @@
 package com.nedyalkoboydev.autoserviceplatform.domain.entities;
 
+import com.nedyalkoboydev.autoserviceplatform.domain.enums.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "appointments_calendar")
+@SuperBuilder
 public class AppointmentCalendar extends BaseEntity {
     @OneToOne(optional = false)
     @JoinColumn(name = "car_service_id", nullable = false)
@@ -21,7 +24,7 @@ public class AppointmentCalendar extends BaseEntity {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
@@ -33,5 +36,10 @@ public class AppointmentCalendar extends BaseEntity {
     private LocalDateTime appointmentTime;
 
     private Double price;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    private String comment;
 }
 
